@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
+using UnityEngine.Audio;
 
 public class gameManager : MonoBehaviour {
 
@@ -16,17 +17,21 @@ public class gameManager : MonoBehaviour {
     int showCombo = 1;
     double currentHealth = 3, maxHealth = 3;
 
+    
 
     private Text activeBrailleText;
     private Text scoreText;
     private Text comboText;
     private Text healthText;
 
+    public AudioMixer masterMixer;
+    private float maxVol = 0f;
+    private float minVol = -80f;
+    private bool playMessySound = false;
 
-    bool same = false; // Used to check if the arrays are the same.
-    
+    float volTimer = 1.0f;
 
-
+    bool same = false; // Used to check if the arrays are the same
 
 
     // Use this for initialization
@@ -44,6 +49,8 @@ public class gameManager : MonoBehaviour {
         healthText = GameObject.Find("healthText").GetComponent<Text>();
         healthText.text = "Health: " + currentHealth;
 
+        masterMixer.SetFloat("correctVersionVol", maxVol);
+        masterMixer.SetFloat("falseVersionVol", minVol);
 
 
         //Player Array
@@ -67,7 +74,10 @@ public class gameManager : MonoBehaviour {
 	void Update () {
 
         Debug.Log("Number: " + randomNumber);
-
+        if (playMessySound)
+            setFalseVol();
+        else
+            setCorrectVol();
     }
 
     void Awake()
@@ -90,7 +100,7 @@ public class gameManager : MonoBehaviour {
 
         if (same)
         {
-
+            playMessySound = false;
             Debug.Log("DEM ÄR LIKA FÖR HELVETE!!");
             resetBoxValue();
             randomNumber = Random.Range(0, 6);
@@ -111,6 +121,7 @@ public class gameManager : MonoBehaviour {
         }
         else
         {
+            playMessySound = true;
             Debug.Log("DEM ÄR INTE LIKA!!");
             resetBoxValue();
             comboCounter = 0;
@@ -168,6 +179,31 @@ public class gameManager : MonoBehaviour {
             myScore += 3.0;
             showCombo = 3;
         }
+    }
+
+    void setCorrectVol()
+    {
+        
+        masterMixer.SetFloat("correctVersionVol", maxVol);
+        masterMixer.SetFloat("falseVersionVol", minVol);
+    }
+
+    void setFalseVol()
+    {
+        masterMixer.SetFloat("correctVersionVol", minVol);
+        masterMixer.SetFloat("falseVersionVol", maxVol);
+
+        volTimer -= Time.deltaTime;
+        Mathf.Round(volTimer);
+        Debug.Log("Time Left:" + Mathf.Round(volTimer));
+
+        if (volTimer < 0)
+        {
+            setCorrectVol();
+            playMessySound = false;
+            volTimer = 1.0f;
+        }
+
     }
 
 
