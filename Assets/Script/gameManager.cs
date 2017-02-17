@@ -71,26 +71,26 @@ public class gameManager : MonoBehaviour {
             { 1, 0, 0, 1, 1, 0 }, // Bokstaven D
             { 1, 0, 0, 0, 1, 0 }, // Bokstaven E
             { 1, 1, 0, 1, 0, 0 }, // Bokstaven F
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven G
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven H
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven I
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven J
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven K
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven L
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven M
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven N
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven O
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven P
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven Q
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven R
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven S
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven T
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven U
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven V
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven W
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven X
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven Y
-            { 1, 1, 0, 1, 0, 0 } // Bokstaven Z
+            { 1, 1, 0, 1, 1, 0 }, // Bokstaven G
+            { 1, 1, 0, 0, 1, 0 }, // Bokstaven H
+            { 0, 1, 0, 1, 0, 0 }, // Bokstaven I
+            { 0, 1, 0, 1, 1, 0 }, // Bokstaven J
+            { 1, 0, 1, 0, 0, 0 }, // Bokstaven K
+            { 1, 1, 1, 0, 0, 0 }, // Bokstaven L
+            { 1, 0, 1, 1, 0, 0 }, // Bokstaven M
+            { 1, 0, 1, 1, 1, 0 }, // Bokstaven N
+            { 1, 0, 1, 0, 1, 0 }, // Bokstaven O
+            { 1, 1, 1, 1, 0, 0 }, // Bokstaven P
+            { 1, 1, 1, 1, 1, 0 }, // Bokstaven Q
+            { 1, 1, 1, 0, 1, 0 }, // Bokstaven R
+            { 0, 1, 1, 1, 0, 0 }, // Bokstaven S
+            { 0, 1, 1, 1, 1, 0 }, // Bokstaven T
+            { 1, 0, 1, 0, 0, 1 }, // Bokstaven U
+            { 1, 1, 1, 0, 0, 1 }, // Bokstaven V
+            { 0, 1, 0, 1, 1, 1 }, // Bokstaven W
+            { 1, 0, 1, 1, 0, 1 }, // Bokstaven X
+            { 1, 0, 1, 1, 1, 1 }, // Bokstaven Y
+            { 1, 0, 1, 0, 1, 1 } // Bokstaven Z
         };
 
         SetLevelNumbers();
@@ -107,12 +107,17 @@ public class gameManager : MonoBehaviour {
         if (levelName.name == "levelOne")
         {
             i = 0;
-            limit = 3;
+            limit = 4;
         }
         else if (levelName.name == "levelTwo")
         {
-            i = 3;
-            limit = 6;
+            i = 4;
+            limit = 9;
+        }
+        else if(levelName.name == "tutorial")
+        {
+            i = 1;
+            limit = 2;
         }
     }
 
@@ -132,35 +137,17 @@ public class gameManager : MonoBehaviour {
     {
     }
 
-    public void CompareArray()
+    void Check()
     {
-        SetLevelNumbers();
-        int rightRow = randomNumber;
-        for (; i < limit; i++) //Compare arrays
-        {
-            if (brailleCharacters[rightRow,i] != buttonValue[i])
-            {
-                same = false;
-                break;
-            }
-            same = true;
-        }
-
         if (same) // If they are the same, do this!
         {
             SetLevelNumbers();
             playMessySound = false;
-            Debug.Log("DEM ÄR LIKA FÖR HELVETE!!");
             resetBoxValue();
-            Debug.Log("PREVIOUS RANDOM NUMBER: " + randomNumber);
             randomNumber = Random.Range(i, limit);
-            if (previousNumber == randomNumber)
-            {
-                Debug.Log("SELECT A NEW RANDOM: " + randomNumber);
+            while (previousNumber == randomNumber)
                 randomNumber = Random.Range(i, limit);
-                previousNumber = randomNumber;
-            }
-
+            previousNumber = randomNumber;
             activeBrailleText.text = alphabet[randomNumber];
 
             addScore();
@@ -173,8 +160,6 @@ public class gameManager : MonoBehaviour {
             {
                 currentHealth = 3;
             }
-
-
         }
         else // Else do this
         {
@@ -184,8 +169,28 @@ public class gameManager : MonoBehaviour {
             comboCounter = 0;
             showCombo = 1;
             currentHealth--;
-            
         }
+    }
+
+    // TODO(MARCUS): Maybe break up into smaller functions
+    public void CompareArray()
+    {
+        SetLevelNumbers();
+        int rightRow = randomNumber;
+        //for (; i < limit; i++) 
+        //{
+        for (int j = 0; j < 6; j++) // Compare arrays
+        {
+            if (brailleCharacters[rightRow, j] != buttonValue[j])
+            {
+                same = false;
+                break;
+            }
+            same = true;
+        }
+        //}
+
+        Check();
 
         if (currentHealth <= 0)
         {
