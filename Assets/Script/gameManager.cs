@@ -18,7 +18,7 @@ public class gameManager : MonoBehaviour {
     int comboCounter = 0;
     int showCombo = 1;
     double currentHealth = 3, maxHealth = 3;
-    int previousNumber = 0;
+    int previousNumber = 0, prevCounter = 0;
 
     Scene levelName;
     int i = 0, limit = 0;
@@ -37,7 +37,7 @@ public class gameManager : MonoBehaviour {
 
     bool same = false; // Used to check if the arrays are the same
 
-
+    public string CurrentBlah = "tutorial";
     // Use this for initialization
     void Start () {
 
@@ -100,24 +100,20 @@ public class gameManager : MonoBehaviour {
         activeBrailleText.text = alphabet[randomNumber];
 
     }
-
+    
     void SetLevelNumbers()
     {
         levelName = SceneManager.GetActiveScene();
-        if (levelName.name == "levelOne")
+        
+        if (levelName.name == "levelOne" || levelName.name == "tutorial")
         {
             i = 0;
             limit = 4;
         }
-        else if (levelName.name == "levelTwo")
+        else if (levelName.name == "levelTwo" ||levelName.name == "tutorialTwo")
         {
             i = 4;
             limit = 9;
-        }
-        else if(levelName.name == "tutorial")
-        {
-            i = 1;
-            limit = 2;
         }
     }
 
@@ -146,7 +142,12 @@ public class gameManager : MonoBehaviour {
             resetBoxValue();
             randomNumber = Random.Range(i, limit);
             while (previousNumber == randomNumber)
+            {
                 randomNumber = Random.Range(i, limit);
+                //prevCounter++;
+                //if (prevCounter >= 10) break;
+            }
+            prevCounter = 0;
             previousNumber = randomNumber;
             activeBrailleText.text = alphabet[randomNumber];
 
