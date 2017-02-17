@@ -3,6 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
+
 
 public class gameManager : MonoBehaviour {
 
@@ -10,14 +12,16 @@ public class gameManager : MonoBehaviour {
     public int[] buttonValue;
     public string[] alphabet;
     public int[,] brailleCharacters;
-    int randomNumber = 0;
+    int randomNumber;
 
     double myScore = 0;
     int comboCounter = 0;
     int showCombo = 1;
     double currentHealth = 3, maxHealth = 3;
+    int previousNumber = 0;
 
-    
+    Scene levelName;
+    int i = 0, limit = 0;
 
     private Text activeBrailleText;
     private Text scoreText;
@@ -57,27 +61,71 @@ public class gameManager : MonoBehaviour {
         buttonValue = new int[6] { 0, 0, 0, 0, 0, 0 };
 
         //Array
-        alphabet = new string[6] { "A", "B", "C", "D", "E", "F" };
+        alphabet = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 
         //Database Array
-        brailleCharacters = new int[6,6] {
+        brailleCharacters = new int[26,6] {
             { 1, 0, 0, 0, 0, 0 }, // Bokstaven A
-            { 1, 0, 1, 0, 0, 0 }, // Bokstaven B
-            { 1, 1, 0, 0, 0, 0 }, // Bokstaven C
-            { 1, 1, 0, 1, 0, 0 }, // Bokstaven D
-            { 1, 0, 0, 1, 0, 0 }, // Bokstaven E
-            { 1, 1, 1, 0, 0, 0 } // Bokstaven F
+            { 1, 1, 0, 0, 0, 0 }, // Bokstaven B
+            { 1, 0, 0, 1, 0, 0 }, // Bokstaven C
+            { 1, 0, 0, 1, 1, 0 }, // Bokstaven D
+            { 1, 0, 0, 0, 1, 0 }, // Bokstaven E
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven F
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven G
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven H
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven I
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven J
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven K
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven L
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven M
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven N
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven O
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven P
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven Q
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven R
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven S
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven T
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven U
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven V
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven W
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven X
+            { 1, 1, 0, 1, 0, 0 }, // Bokstaven Y
+            { 1, 1, 0, 1, 0, 0 } // Bokstaven Z
         };
-    }
-	
-	// Update is called once per frame
-	void Update () {
 
-        Debug.Log("Number: " + randomNumber);
+        SetLevelNumbers();
+
+        randomNumber = Random.Range(i, limit);
+        previousNumber = randomNumber;
+        activeBrailleText.text = alphabet[randomNumber];
+
+    }
+
+    void SetLevelNumbers()
+    {
+        levelName = SceneManager.GetActiveScene();
+        if (levelName.name == "levelOne")
+        {
+            i = 0;
+            limit = 3;
+        }
+        else if (levelName.name == "levelTwo")
+        {
+            i = 3;
+            limit = 6;
+        }
+    }
+
+    // Update is called once per frame
+    void Update () {
+
+        //Debug.Log("Number: " + randomNumber);
         if (playMessySound)
             setFalseVol();
         else
             setCorrectVol();
+
+        //Debug.Log(i + "|" + limit);
     }
 
     void Awake()
@@ -86,9 +134,9 @@ public class gameManager : MonoBehaviour {
 
     public void CompareArray()
     {
-
+        SetLevelNumbers();
         int rightRow = randomNumber;
-        for (int i = 0; i < 6; i++)
+        for (; i < limit; i++) //Compare arrays
         {
             if (brailleCharacters[rightRow,i] != buttonValue[i])
             {
@@ -98,12 +146,21 @@ public class gameManager : MonoBehaviour {
             same = true;
         }
 
-        if (same)
+        if (same) // If they are the same, do this!
         {
+            SetLevelNumbers();
             playMessySound = false;
             Debug.Log("DEM ÄR LIKA FÖR HELVETE!!");
             resetBoxValue();
-            randomNumber = Random.Range(0, 6);
+            Debug.Log("PREVIOUS RANDOM NUMBER: " + randomNumber);
+            randomNumber = Random.Range(i, limit);
+            if (previousNumber == randomNumber)
+            {
+                Debug.Log("SELECT A NEW RANDOM: " + randomNumber);
+                randomNumber = Random.Range(i, limit);
+                previousNumber = randomNumber;
+            }
+
             activeBrailleText.text = alphabet[randomNumber];
 
             addScore();
@@ -119,7 +176,7 @@ public class gameManager : MonoBehaviour {
 
 
         }
-        else
+        else // Else do this
         {
             playMessySound = true;
             Debug.Log("DEM ÄR INTE LIKA!!");
